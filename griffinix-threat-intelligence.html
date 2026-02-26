@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Griffinix — Impact on Threat Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #080c12;
+  --deep: #0a111b;
+  --panel: #0e1825;
+  --card: #111d2b;
+  --border: rgba(255,255,255,0.07);
+  --border-glow: rgba(0,210,255,0.2);
+  --electric: #00d2ff;
+  --electric-dim: rgba(0,210,255,0.10);
+  --gold: #c9a96e;
+  --gold-dim: rgba(201,169,110,0.12);
+  --white: #ffffff;
+  --text: rgba(255,255,255,0.82);
+  --muted: rgba(255,255,255,0.42);
+  --subtle: rgba(255,255,255,0.06);
+  --green: #00e5a0;
+  --green-dim: rgba(0,229,160,0.10);
+  --red: #ff4d6d;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ink);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.85;
+  overflow-x: hidden;
+}
+
+/* PROGRESS BAR */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--electric), var(--gold), var(--green));
+  z-index: 1000;
+  width: 0;
+  transition: width 0.1s linear;
+}
+
+/* ── COVER ── */
+.cover {
+  min-height: 100vh;
+  background: var(--deep);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 80px 40px;
+}
+
+.cover-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,210,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,210,255,0.035) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridDrift 24s linear infinite;
+}
+@keyframes gridDrift {
+  to { transform: translate(60px, 60px); }
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(130px);
+  pointer-events: none;
+  animation: orbFloat 10s ease-in-out infinite alternate;
+}
+.orb-a { width:700px;height:700px;top:-250px;left:-200px;background:radial-gradient(circle,rgba(0,210,255,0.11) 0%,transparent 70%); }
+.orb-b { width:500px;height:500px;bottom:-180px;right:-120px;background:radial-gradient(circle,rgba(201,169,110,0.08) 0%,transparent 70%);animation-delay:-5s; }
+.orb-c { width:320px;height:320px;top:40%;right:12%;background:radial-gradient(circle,rgba(0,229,160,0.06) 0%,transparent 70%);animation-delay:-2.5s; }
+@keyframes orbFloat {
+  from { transform: scale(1); opacity:.6; }
+  to   { transform: scale(1.12); opacity:1; }
+}
+
+.cover-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 840px;
+}
+
+.cover-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--electric);
+  margin-bottom: 32px;
+  padding: 8px 22px;
+  border: 1px solid rgba(0,210,255,0.25);
+  border-radius: 100px;
+  background: rgba(0,210,255,0.07);
+  animation: fadeUp .9s ease both;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--electric);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.cover-wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(84px,14vw,148px);
+  letter-spacing: 10px;
+  line-height: 1;
+  margin-bottom: 6px;
+  animation: fadeUp .9s .1s ease both;
+  background: linear-gradient(135deg, #ffffff 0%, #b0d4f0 45%, var(--electric) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cover-brand-line {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 7px;
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 300;
+  margin-bottom: 58px;
+  animation: fadeUp .9s .2s ease both;
+}
+
+.cover-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 44px;
+  animation: fadeUp .9s .3s ease both;
+}
+.orn-line {
+  width: 90px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.orn-line:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
+.orn-diamond {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.cover-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4.5vw, 48px);
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1.3;
+  margin-bottom: 18px;
+  animation: fadeUp .9s .4s ease both;
+}
+.cover-title em {
+  font-style: italic;
+  color: var(--electric);
+}
+
+.cover-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 56px;
+  letter-spacing: .5px;
+  animation: fadeUp .9s .5s ease both;
+}
+
+.cover-pills {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp .9s .6s ease both;
+}
+.pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeUp .9s 1.2s ease both;
+}
+.scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--electric));
+  animation: scrollAnim 2.2s ease-in-out infinite;
+}
+@keyframes scrollAnim {
+  0%,100%{opacity:.3;transform:scaleY(.5) translateY(-8px)}
+  50%{opacity:1;transform:scaleY(1) translateY(0)}
+}
+.scroll-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── LAYOUT ── */
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 32px 120px;
+}
+
+/* ── ABSTRACT ── */
+.abstract {
+  margin: 80px 0 64px;
+}
+.abstract-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0 0 12px 12px;
+  padding: 44px 52px;
+  position: relative;
+}
+.abstract-box::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--electric), var(--gold), var(--green));
+  border-radius:2px 2px 0 0;
+}
+.abstract-tag {
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--electric);
+  display:block;
+  margin-bottom:20px;
+}
+.abstract-box p {
+  color:var(--muted);
+  font-weight:300;
+  margin-bottom:16px;
+  line-height:1.9;
+}
+.abstract-box p:last-child{margin-bottom:0;}
+.abstract-box strong{color:var(--text);font-weight:500;}
+
+/* ── TOC ── */
+.toc {
+  margin-bottom:80px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+.toc-head {
+  padding:20px 36px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.toc-label {
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.toc-rule{flex:1;height:1px;background:var(--border);}
+.toc ol{list-style:none;padding:10px 0;}
+.toc-row {
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  padding:10px 36px;
+  border-bottom:1px solid var(--border);
+  transition:background .2s;
+}
+.toc-row:last-child{border-bottom:none;}
+.toc-row:hover{background:rgba(0,210,255,0.04);}
+.toc-n{font-family:'DM Mono',monospace;font-size:10px;color:var(--electric);min-width:26px;}
+.toc-t{font-size:13.5px;color:var(--muted);}
+.toc-dots{flex:1;border-bottom:1px dotted rgba(255,255,255,0.08);margin:0 8px;position:relative;top:-4px;}
+
+/* ── CHAPTER ── */
+.chapter {
+  margin-bottom:100px;
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .7s ease, transform .7s ease;
+}
+.chapter.vis{opacity:1;transform:translateY(0);}
+
+.ch-header {
+  display:flex;
+  align-items:flex-start;
+  gap:24px;
+  margin-bottom:44px;
+  padding-bottom:28px;
+  position:relative;
+}
+.ch-header::after {
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg, var(--electric), transparent 60%);
+}
+.ch-num-wrap{flex-shrink:0;}
+.ch-num-lbl {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:10px;
+  letter-spacing:3px;
+  color:var(--electric);
+  display:block;
+  margin-bottom:2px;
+}
+.ch-num-big {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:80px;
+  line-height:1;
+  color:var(--subtle);
+  letter-spacing:-2px;
+  user-select:none;
+}
+.ch-texts{padding-top:8px;}
+.ch-en{
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--electric);
+  margin-bottom:8px;
+  display:block;
+}
+.ch-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(24px,3.8vw,38px);
+  font-weight:600;
+  color:var(--white);
+  line-height:1.25;
+}
+
+/* ── HEADINGS ── */
+h3 {
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:2.5px;
+  color:var(--gold);
+  margin:44px 0 18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+h3::before{content:'';display:inline-block;width:20px;height:1px;background:var(--gold);flex-shrink:0;}
+h3::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+p{margin-bottom:16px;}
+
+ul{list-style:none;padding:0;margin-bottom:20px;}
+ul li{
+  padding:9px 0 9px 24px;
+  position:relative;
+  border-bottom:1px solid var(--border);
+  font-size:14px;
+  color:var(--text);
+}
+ul li:last-child{border-bottom:none;}
+ul li::before{content:'›';position:absolute;left:0;color:var(--electric);font-size:18px;line-height:1.4;}
+ul li strong{color:var(--white);font-weight:500;}
+
+/* ── CALLOUTS ── */
+.callout{
+  border-radius:8px;
+  padding:20px 24px;
+  margin:24px 0;
+  font-size:14px;
+  border:1px solid;
+  position:relative;
+  overflow:hidden;
+  line-height:1.7;
+}
+.callout::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+.callout.blue{background:var(--electric-dim);border-color:rgba(0,210,255,0.18);color:rgba(180,235,255,.88);}
+.callout.blue::before{background:var(--electric);}
+.callout.gold{background:var(--gold-dim);border-color:rgba(201,169,110,0.22);color:rgba(235,215,170,.88);}
+.callout.gold::before{background:var(--gold);}
+.callout.green{background:var(--green-dim);border-color:rgba(0,229,160,0.18);color:rgba(165,245,215,.88);}
+.callout.green::before{background:var(--green);}
+.callout strong{
+  display:block;
+  font-family:'DM Mono',monospace;
+  font-size:9.5px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.callout.blue strong{color:var(--electric);}
+.callout.gold strong{color:var(--gold);}
+.callout.green strong{color:var(--green);}
+
+/* ── TABLES ── */
+.table-wrap{margin:24px 0 32px;border-radius:10px;border:1px solid var(--border);overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);}
+thead tr{background:linear-gradient(135deg,#08131f,#0b1e32);}
+thead th{
+  color:var(--muted);
+  font-family:'DM Mono',monospace;
+  font-size:9.5px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:14px 18px;
+  text-align:left;
+  font-weight:400;
+  border-bottom:1px solid rgba(0,210,255,0.15);
+  white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .2s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(0,210,255,0.03);}
+td{padding:14px 18px;vertical-align:top;line-height:1.7;color:var(--text);}
+td strong{color:var(--white);font-weight:500;}
+
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:4px;
+  font-family:'DM Mono',monospace;font-size:9.5px;
+  letter-spacing:1px;font-weight:500;text-transform:uppercase;
+}
+.badge::before{content:'●';font-size:7px;}
+.badge-yes{background:rgba(0,229,160,0.1);color:var(--green);border:1px solid rgba(0,229,160,0.22);}
+.badge-yes::before{color:var(--green);}
+.badge-no{background:rgba(255,77,109,0.09);color:#ff9aad;border:1px solid rgba(255,77,109,0.18);}
+.badge-no::before{color:var(--red);}
+.badge-partial{background:rgba(201,169,110,0.1);color:var(--gold);border:1px solid rgba(201,169,110,0.22);}
+.badge-partial::before{color:var(--gold);}
+
+/* ── CARD GRID ── */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0 32px;}
+@media(max-width:620px){.card-grid{grid-template-columns:1fr;}}
+.val-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:28px 24px;position:relative;overflow:hidden;
+  transition:border-color .3s, transform .3s;
+}
+.val-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--electric),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.val-card:hover{border-color:rgba(0,210,255,0.22);transform:translateY(-3px);}
+.val-card:hover::before{opacity:1;}
+.vc-icon{font-size:28px;margin-bottom:14px;display:block;}
+.vc-title{font-size:12px;font-weight:600;color:var(--white);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;}
+.val-card p{font-size:13px;color:var(--muted);line-height:1.7;margin:0;}
+
+/* ── STAT ROW ── */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0;}
+@media(max-width:600px){.stat-row{grid-template-columns:1fr;}}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 18px;text-align:center;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;line-height:1;margin-bottom:6px;}
+.stat-val .unit{font-size:20px;}
+.s-electric{color:var(--electric);}
+.s-gold{color:var(--gold);}
+.s-green{color:var(--green);}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
+
+/* ── CYCLE VISUAL ── */
+.cycle-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:28px 0;}
+.cycle-node{
+  padding:28px 18px;text-align:center;background:var(--card);
+  border-right:1px solid var(--border);position:relative;
+}
+.cycle-node:last-child{border-right:none;}
+.cycle-node::after{
+  content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);
+  color:var(--electric);font-size:16px;z-index:1;background:var(--card);padding:2px 4px;
+}
+.cycle-node:last-child::after{display:none;}
+.cn-icon{font-size:26px;margin-bottom:10px;display:block;}
+.cn-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--white);margin-bottom:6px;}
+.cn-desc{font-size:11.5px;color:var(--muted);line-height:1.5;}
+@media(max-width:640px){
+  .cycle-grid{grid-template-columns:1fr;}
+  .cycle-node{border-right:none;border-bottom:1px solid var(--border);}
+  .cycle-node::after{content:'↓';right:50%;top:auto;bottom:-14px;transform:translateX(50%);background:var(--card);}
+  .cycle-node:last-child{border-bottom:none;}
+}
+
+/* ── SCENARIOS ── */
+.scenario{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;margin-bottom:24px;transition:border-color .3s;
+}
+.scenario:hover{border-color:rgba(0,210,255,0.2);}
+.sc-head{
+  background:linear-gradient(135deg,#0a1825,#0e223a);
+  padding:16px 24px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid var(--border);
+}
+.sc-icon{font-size:22px;flex-shrink:0;}
+.sc-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);}
+.sc-body{padding:24px;}
+.sc-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--electric);margin-bottom:8px;display:block;}
+.sc-body p{font-size:13.5px;margin-bottom:16px;color:var(--muted);line-height:1.75;}
+.outcome{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--green-dim);border:1px solid rgba(0,229,160,0.18);
+  border-radius:8px;padding:10px 18px;font-size:13px;color:var(--green);font-weight:500;margin-top:8px;
+}
+
+/* ── STATUS ── */
+.status{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.5px;font-weight:500;}
+.s-planned{color:var(--electric);}
+.s-ongoing{color:var(--gold);}
+
+/* ── SUMMARY ── */
+.summary-table td:first-child{color:var(--white);font-weight:500;}
+
+/* ── FOOTER ── */
+.doc-footer{
+  border-top:1px solid var(--border);
+  padding:36px 32px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+  max-width:980px;margin:0 auto;
+}
+.f-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;
+  background:linear-gradient(135deg,#fff,var(--electric));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.f-meta{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.f-class{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;
+  color:var(--gold);padding:5px 14px;border:1px solid rgba(201,169,110,0.28);border-radius:4px;text-transform:uppercase;
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="pb"></div>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <div class="cover-grid"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+  <div class="cover-inner">
+    <div class="cover-eyebrow"><div class="live-dot"></div>Intelligent Software Behavior Analysis</div>
+    <div class="cover-wordmark">GRIFFINIX</div>
+    <div class="cover-brand-line">The Intelligence Behind Every Decision</div>
+    <div class="cover-ornament">
+      <div class="orn-line"></div>
+      <div class="orn-diamond"></div>
+      <div class="orn-line"></div>
+    </div>
+    <h1 class="cover-title">The Impact of Griffinix on<br><em>Threat Intelligence</em></h1>
+    <p class="cover-subtitle">Values, Applications &amp; the Problems It Solves</p>
+    <div class="cover-pills">
+      <span class="pill">February 2026</span>
+      <span class="pill">Version 1.0</span>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <div class="scroll-text">Scroll</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══ ABSTRACT ═══ -->
+<div class="abstract">
+  <div class="abstract-box">
+    <span class="abstract-tag">Executive Abstract</span>
+    <p>In the modern cybersecurity landscape, <strong>Threat Intelligence (TI)</strong> is the spine of organizational defense. Yet the quality of this intelligence depends directly on the depth, speed, and precision of behavioral software analysis — and this is precisely where most existing solutions fall critically short.</p>
+    <p>Griffinix solves a problem no other commercial tool has addressed in integrated form: the <strong>complete understanding of software behavior</strong> — from internal architecture to live execution — preserving that knowledge in a permanently searchable, reusable form.</p>
+    <p>This document is designed for non-technical decision-makers to understand the value Griffinix creates across the threat intelligence lifecycle, and which long-standing, unsolved problems it resolves.</p>
+  </div>
+</div>
+
+<!-- ═══ TOC ═══ -->
+<div class="toc">
+  <div class="toc-head">
+    <span class="toc-label">Contents</span>
+    <div class="toc-rule"></div>
+  </div>
+  <ol>
+    <div class="toc-row"><span class="toc-n">01</span><span class="toc-t">What Is Threat Intelligence &amp; Why Most Tools Fall Short</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">02</span><span class="toc-t">Griffinix — A New Approach to Threat Analysis</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">03</span><span class="toc-t">Capability I — Deep Software Intelligence</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">04</span><span class="toc-t">Capability II — Live Behavioral Observation</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">05</span><span class="toc-t">Capability III — The Intelligent Threat Library</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">06</span><span class="toc-t">Synergy — The Complete TI Lifecycle</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">07</span><span class="toc-t">Competitive Landscape Comparison</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">08</span><span class="toc-t">Elevating Threat Intelligence Quality</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">09</span><span class="toc-t">Practical Use Cases</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">10</span><span class="toc-t">Limitations &amp; Development Roadmap</span><div class="toc-dots"></div></div>
+    <div class="toc-row"><span class="toc-n">11</span><span class="toc-t">Conclusion</span><div class="toc-dots"></div></div>
+  </ol>
+</div>
+
+<!-- ═══ CH 1 ═══ -->
+<div class="chapter" id="ch1">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">01</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Threat Intelligence Challenges</span>
+      <h2 class="ch-title">What Is Threat Intelligence &amp; Why Most Tools Fall Short</h2>
+    </div>
+  </div>
+
+  <h3>Four Pillars of Effective Threat Intelligence</h3>
+  <p>Threat Intelligence is the knowledge that helps organizations understand the nature, motivation, and methods of cyber adversaries. But this knowledge is only valuable when it possesses four essential qualities:</p>
+
+  <div class="card-grid">
+    <div class="val-card">
+      <span class="vc-icon">⏱️</span>
+      <div class="vc-title">Timeliness</div>
+      <p>Intelligence must be available before an attack occurs. Every hour of delay is another hour of advantage for the adversary.</p>
+    </div>
+    <div class="val-card">
+      <span class="vc-icon">🎯</span>
+      <div class="vc-title">Accuracy</div>
+      <p>Incorrect intelligence is more dangerous than none. Every false positive erodes trust in the entire detection system.</p>
+    </div>
+    <div class="val-card">
+      <span class="vc-icon">🔬</span>
+      <div class="vc-title">Depth</div>
+      <p>Knowing a file is "suspicious" is not enough. We must understand what it truly does, for what purpose, and with what effect.</p>
+    </div>
+    <div class="val-card">
+      <span class="vc-icon">⚡</span>
+      <div class="vc-title">Actionability</div>
+      <p>Intelligence must lead to concrete decisions: block, alert, respond. Without this translation, data remains inert.</p>
+    </div>
+  </div>
+
+  <h3>The Four Fundamental Gaps in Traditional TI</h3>
+  <p>Existing threat intelligence platforms contend with four structural gaps that prevent genuine effectiveness:</p>
+
+  <div class="callout blue">
+    <strong>Gap One — Indicator-Centric Thinking</strong>
+    Most TI systems track only surface indicators: file hashes, malicious IPs, suspicious domains. Adversaries trivially bypass these defenses by changing a file's appearance, rotating infrastructure, or registering new domains. This approach is inherently reactive — perpetually one step behind the attacker.
+  </div>
+  <div class="callout blue">
+    <strong>Gap Two — Absence of Behavioral Understanding</strong>
+    Existing tools flag a file as "suspicious" but cannot explain what it does, what purpose it was designed to serve, or what its real-world impact will be. Without this understanding, every security decision is made partially blind.
+  </div>
+  <div class="callout blue">
+    <strong>Gap Three — Disconnected Static &amp; Dynamic Analysis</strong>
+    Examining a file's structure and observing its runtime behavior are typically performed with separate, unintegrated tools. This fragmentation allows threats that only reveal their true nature during execution to slip through the security net entirely.
+  </div>
+  <div class="callout blue">
+    <strong>Gap Four — Dispersed, Non-Searchable Knowledge</strong>
+    Knowledge gained from each analysis is typically locked in PDF reports or siloed databases. When a similar threat resurfaces months later, the analyst must restart from zero — institutional memory does not exist.
+  </div>
+</div>
+
+<!-- ═══ CH 2 ═══ -->
+<div class="chapter" id="ch2">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">02</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Griffinix Approach</span>
+      <h2 class="ch-title">Griffinix — A New Approach to Threat Analysis</h2>
+    </div>
+  </div>
+
+  <h3>The Central Principle: Understand Behavior, Not Match Patterns</h3>
+  <p>Griffinix is built on one foundational principle: <strong>genuine understanding of software behavior</strong> — not merely matching against known threat signatures. This distinction is subtle but fundamental:</p>
+  <ul>
+    <li>Traditional tools ask: <strong>"Does this file resemble something we have seen before?"</strong></li>
+    <li>Griffinix asks: <strong>"What does this file actually do — and should we trust it?"</strong></li>
+  </ul>
+
+  <div class="callout green">
+    <strong>The Practical Consequence</strong>
+    Griffinix can identify entirely novel, previously unseen threats through behavioral analysis alone — threats that traditional tools walk past without detection, because no matching signature exists.
+  </div>
+
+  <h3>Three Integrated Capabilities</h3>
+  <p>Griffinix delivers three complementary capabilities within a single unified platform — a combination no competitor offers:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Capability</th><th>Problem It Solves</th><th>TI Value Created</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Deep Software Intelligence</strong></td><td>We don't know what a program was designed to do</td><td>Understanding the true intent of a threat</td></tr>
+        <tr><td><strong>Live Behavioral Observation</strong></td><td>Some threats only manifest during execution</td><td>Detection of concealed, evasive threats</td></tr>
+        <tr><td><strong>Intelligent Threat Library</strong></td><td>Analytical knowledge is dispersed and unusable</td><td>Searchable, persistent organizational memory</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>The Unified Analysis Lifecycle</h3>
+  <p>A complete analysis cycle in Griffinix flows through six integrated phases:</p>
+  <div class="cycle-grid">
+    <div class="cycle-node"><span class="cn-icon">📥</span><div class="cn-title">Ingestion</div><div class="cn-desc">Suspicious file submitted via web or API</div></div>
+    <div class="cycle-node"><span class="cn-icon">⚖️</span><div class="cn-title">Assessment</div><div class="cn-desc">Initial classification with confidence score</div></div>
+    <div class="cycle-node"><span class="cn-icon">🔍</span><div class="cn-title">Structural</div><div class="cn-desc">What the software was designed to perform</div></div>
+  </div>
+  <div class="cycle-grid" style="margin-top:0;border-top:none;border-radius:0 0 10px 10px;">
+    <div class="cycle-node"><span class="cn-icon">🏃</span><div class="cn-title">Live Observe</div><div class="cn-desc">Monitored execution in isolated environment</div></div>
+    <div class="cycle-node"><span class="cn-icon">📋</span><div class="cn-title">Report</div><div class="cn-desc">Comprehensive, human-readable output</div></div>
+    <div class="cycle-node"><span class="cn-icon">🧠</span><div class="cn-title">Preserved</div><div class="cn-desc">Knowledge stored permanently in library</div></div>
+  </div>
+</div>
+
+<!-- ═══ CH 3 ═══ -->
+<div class="chapter" id="ch3">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">03</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Capability I — Software Intelligence</span>
+      <h2 class="ch-title">Deep Software Intelligence</h2>
+    </div>
+  </div>
+
+  <h3>The Problem It Solves</h3>
+  <p>Understanding what software does <em>internally</em> is the hardest challenge in threat analysis. Commercial software arrives only as executable files — no source code, no design documentation. Manual analysis requires specialists who may spend 4 to 40 hours on a single file, at costs between $500 and $5,000 per sample.</p>
+  <p>Griffinix automates this entirely: a binary is submitted and within minutes, a comprehensive report explains what that software was designed to accomplish.</p>
+
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-val s-gold">4–40<span class="unit">h</span></div><div class="stat-lbl">Manual Analysis Time</div></div>
+    <div class="stat-box"><div class="stat-val s-electric">&lt;5<span class="unit">m</span></div><div class="stat-lbl">With Griffinix</div></div>
+    <div class="stat-box"><div class="stat-val s-green">$5k</div><div class="stat-lbl">Cost Saved Per Sample</div></div>
+  </div>
+
+  <h3>Value for Threat Intelligence</h3>
+  <ul>
+    <li><strong>Intent Identification</strong> — Not merely "suspicious" but "this file was designed to access sensitive data and exfiltrate it"</li>
+    <li><strong>Hidden Behavior Detection</strong> — Code architected to evade detection is itself a strong signal of advanced threat capability</li>
+    <li><strong>MITRE ATT&amp;CK Mapping</strong> — Identified behaviors are automatically mapped to the industry-standard attack framework</li>
+    <li><strong>Organizational Depth</strong> — Reports usable across technical, executive, legal, and compliance teams</li>
+  </ul>
+
+  <h3>Categories of Detectable Behaviors</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Behavior Category</th><th>Examples Detected</th><th>TI Significance</th></tr></thead>
+      <tbody>
+        <tr><td>Network Communications</td><td>External server connections, covert tunneling</td><td>C2 communication identification</td></tr>
+        <tr><td>File System Access</td><td>File encryption, creation of new executables</td><td>Ransomware detection</td></tr>
+        <tr><td>System Manipulation</td><td>Process injection, registry modification</td><td>High-privilege malware identification</td></tr>
+        <tr><td>Persistence Mechanisms</td><td>Startup installation, service creation</td><td>Spyware &amp; implant detection</td></tr>
+        <tr><td>Evasion &amp; Obfuscation</td><td>Anti-analysis techniques, obfuscated code</td><td>Measuring threat sophistication level</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ CH 4 ═══ -->
+<div class="chapter" id="ch4">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">04</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Capability II — Behavioral Observation</span>
+      <h2 class="ch-title">Live Behavioral Observation</h2>
+    </div>
+  </div>
+
+  <h3>The Problem It Solves</h3>
+  <p>A category of sophisticated threats appears entirely benign until executed. These are specifically engineered to evade conventional analysis:</p>
+  <ul>
+    <li>Malware that executes malicious payloads only in memory, leaving no trace on disk</li>
+    <li>Software that establishes malicious communications only during genuine runtime</li>
+    <li>Threats that behave differently based on environment — country, OS version, presence of specific files</li>
+  </ul>
+  <p>Executing such a file on a real system to "observe its behavior" is obviously unacceptable. Griffinix provides a fully isolated, controlled environment where suspicious software can run freely — revealing its true nature without any risk to production systems.</p>
+
+  <h3>Value for Threat Intelligence</h3>
+  <div class="card-grid">
+    <div class="val-card">
+      <span class="vc-icon">🔎</span>
+      <div class="vc-title">Real Behavior, Not Claims</div>
+      <p>What the software actually does is recorded — not what its surface appearance suggests.</p>
+    </div>
+    <div class="val-card">
+      <span class="vc-icon">🕵️</span>
+      <div class="vc-title">Evasive Threat Detection</div>
+      <p>The environment is architected so even sophisticated software cannot detect it is under analysis.</p>
+    </div>
+    <div class="val-card">
+      <span class="vc-icon">⚖️</span>
+      <div class="vc-title">Forensic-Grade Evidence</div>
+      <p>A complete timeline of every action taken — for regulatory compliance, insurance, and legal proceedings.</p>
+    </div>
+    <div class="val-card">
+      <span class="vc-icon">🔗</span>
+      <div class="vc-title">Picture Completion</div>
+      <p>Results are fused with structural analysis to produce a complete, unified picture of the threat.</p>
+    </div>
+  </div>
+
+  <h3>Data Collected During Live Observation</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data Type</th><th>Information Revealed</th></tr></thead>
+      <tbody>
+        <tr><td>File System Operations</td><td>Files created, modified, or deleted during execution</td></tr>
+        <tr><td>Network Communications</td><td>Servers the file attempts to contact</td></tr>
+        <tr><td>System Changes</td><td>Settings altered, services installed, registry keys written</td></tr>
+        <tr><td>System Call Sequence</td><td>Complete ordered timeline of all system operations performed</td></tr>
+        <tr><td>Extracted Artifacts</td><td>Decrypted content that existed only in memory during execution</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ CH 5 ═══ -->
+<div class="chapter" id="ch5">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">05</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Capability III — Behavioral Intelligence Library</span>
+      <h2 class="ch-title">The Intelligent Threat Library</h2>
+    </div>
+  </div>
+
+  <h3>The Problem It Solves</h3>
+  <p>Every time a threat is analyzed, valuable knowledge is generated. Yet most organizations store this knowledge in PDF reports that become nearly impossible to find months later. The result: an analyst encounters a threat whose behavior mirrors something analyzed six months ago — and is forced to begin the entire process from scratch.</p>
+  <p>Griffinix automatically stores every analysis in an intelligent, fully searchable library organized around <strong>behavior</strong> — not surface appearance.</p>
+
+  <h3>Superiority Over Existing Platforms</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Platform</th><th>What It Stores</th><th>What It Lacks</th></tr></thead>
+      <tbody>
+        <tr><td>MalwareBazaar / VirusShare</td><td>File + basic metadata</td><td>No behavioral analysis whatsoever</td></tr>
+        <tr><td>VirusTotal</td><td>Multi-AV scan results</td><td>No genuine behavioral understanding</td></tr>
+        <tr><td>Academic Datasets</td><td>Preprocessed statistical features</td><td>Not natural-language searchable</td></tr>
+        <tr><td>Joe Sandbox</td><td>Individual behavioral reports</td><td>No unified, searchable library</td></tr>
+        <tr><td><strong>Griffinix Marketplace</strong></td><td><strong>Complete behavioral analysis of every sample</strong></td><td><strong>—</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Natural Language Search Interface</h3>
+  <p>The primary interface to this library is an intelligent conversational assistant. Rather than requiring specialized query knowledge, analysts can ask:</p>
+  <ul>
+    <li><em>"Ransomware samples that encrypt files and establish connections to external servers"</em></li>
+    <li><em>"Security software with network access that modifies system configuration"</em></li>
+    <li><em>"Threats with behavior similar to the incident we observed three days ago"</em></li>
+  </ul>
+
+  <div class="callout green">
+    <strong>Compounding Strategic Value</strong>
+    This library becomes more valuable with every analysis performed. It is a compounding organizational asset that strengthens over time — not one that depreciates. The longer Griffinix is deployed, the wider the competitive advantage in threat response becomes.
+  </div>
+</div>
+
+<!-- ═══ CH 6 ═══ -->
+<div class="chapter" id="ch6">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">06</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Integrated TI Lifecycle</span>
+      <h2 class="ch-title">Synergy — The Complete TI Lifecycle</h2>
+    </div>
+  </div>
+
+  <h3>Why Integration Is the Decisive Advantage</h3>
+  <p>Most organizations use separate tools for static analysis, sandboxing, and threat intelligence storage. This fragmentation carries hidden costs: information is lost between tools, context evaporates, and the final picture is always incomplete.</p>
+  <p>In Griffinix, all three capabilities operate together within a single coherent cycle — creating capabilities that no individual tool can possess independently:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>From</th><th>To</th><th>What Is Transferred</th><th>TI Value</th></tr></thead>
+      <tbody>
+        <tr><td>Structural Analysis</td><td>Behavioral Observation</td><td>Suspicious sections requiring runtime examination</td><td>Targeted sandboxing — not blind execution</td></tr>
+        <tr><td>Behavioral Observation</td><td>Structural Analysis</td><td>Real observed runtime behavior</td><td>A more complete picture of the threat</td></tr>
+        <tr><td>Both Capabilities</td><td>Intelligent Library</td><td>Complete analysis + behavioral tags</td><td>Enrichment of organizational memory</td></tr>
+        <tr><td>Intelligent Library</td><td>Future Analyses</td><td>Similar behavioral patterns from the past</td><td>Acceleration of all future TI work</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>The Self-Reinforcing Cycle</h3>
+  <p>Every analysis enriches the behavioral library. A richer library makes future analyses more precise. More precise analyses produce higher-quality threat intelligence. This cycle creates a compounding competitive advantage — a structural moat that deepens the longer Griffinix is deployed.</p>
+</div>
+
+<!-- ═══ CH 7 ═══ -->
+<div class="chapter" id="ch7">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">07</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Competitive Landscape</span>
+      <h2 class="ch-title">Competitive Landscape Comparison</h2>
+    </div>
+  </div>
+
+  <h3>Capability Matrix</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Capability</th><th>VirusTotal</th><th>ANY.RUN</th><th>VMRay</th><th>Joe Sandbox</th><th>Griffinix</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Software structure &amp; intent understanding</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-partial">Limited</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>Live behavioral observation</td><td><span class="badge badge-partial">Limited</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>Integrated static + dynamic analysis</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>Plain-language, actionable reports</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-partial">Limited</span></td><td><span class="badge badge-partial">Limited</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>Searchable behavioral intelligence library</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>Natural language search interface</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>MITRE ATT&amp;CK framework mapping</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-partial">Limited</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+        <tr><td>On-premise deployment</td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">Yes</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>The Primary Competitive Advantage</h3>
+  <p>Each competitor performs well within a single layer of analysis. Griffinix is the only platform that delivers all three layers in an integrated, coherent system — plus a behavioral intelligence library that no competitor offers in any comparable form. This is not a feature gap — it is an architectural advantage.</p>
+</div>
+
+<!-- ═══ CH 8 ═══ -->
+<div class="chapter" id="ch8">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">08</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">TI Quality Improvements</span>
+      <h2 class="ch-title">Elevating Threat Intelligence Quality</h2>
+    </div>
+  </div>
+
+  <h3>Advancing All Four TI Quality Dimensions</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dimension</th><th>Without Griffinix</th><th>With Griffinix</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Timeliness</strong></td><td>4–40 hours of expert manual analysis</td><td>Comprehensive report in minutes</td></tr>
+        <tr><td><strong>Accuracy</strong></td><td>Dependent on analyst experience; human error risk</td><td>Data-driven, consistent, and repeatable</td></tr>
+        <tr><td><strong>Depth</strong></td><td>Limited to what scanning tools detect on the surface</td><td>Full structural + behavioral + historical understanding</td></tr>
+        <tr><td><strong>Actionability</strong></td><td>Technical reports incomprehensible to leadership</td><td>Clear narrative describing intent, risk, and required action</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Transforming Threat Hunting</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Activity</th><th>Without Griffinix</th><th>With Griffinix</th></tr></thead>
+      <tbody>
+        <tr><td>Threat Search</td><td>Requires knowing exact name or hash</td><td>Search by behavioral description in natural language</td></tr>
+        <tr><td>Family Attribution</td><td>Dependent on signature or hash match</td><td>Behavioral pattern comparison</td></tr>
+        <tr><td>Campaign Discovery</td><td>Weeks of manual investigation</td><td>Hours via behavioral library search</td></tr>
+        <tr><td>Team Knowledge Sharing</td><td>Non-searchable PDF reports</td><td>Unified behavioral library accessible to all</td></tr>
+        <tr><td>New Variant Detection</td><td>Requires a new signature</td><td>Detection via behavioral similarity</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Value in Incident Response</h3>
+  <ul>
+    <li>Immediate analysis of a suspicious file with a complete report in minutes — not days</li>
+    <li>Linkage to similar historical threats for identification of broader attack campaigns</li>
+    <li>Precise timeline of every action performed, for forensics teams and attribution work</li>
+    <li>Structured, documented evidence for regulatory compliance, insurance, and legal proceedings</li>
+  </ul>
+</div>
+
+<!-- ═══ CH 9 ═══ -->
+<div class="chapter" id="ch9">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">09</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Practical Use Cases</span>
+      <h2 class="ch-title">Practical Use Cases</h2>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="sc-head"><span class="sc-icon">🏦</span><div class="sc-title">Scenario I — Bank Under Attack</div></div>
+    <div class="sc-body">
+      <span class="sc-lbl">Situation</span>
+      <p>A bank's email system receives 47 suspicious file attachments in a single day — far more than the security team can manually review. Every unchecked file is a potential entry point for a ransomware attack capable of paralyzing operations.</p>
+      <span class="sc-lbl">With Griffinix</span>
+      <p>All 47 files are analyzed automatically and simultaneously. Within two hours the team has complete classification: 39 files confirmed safe, 5 flagged for additional review, 3 identified as active ransomware with full behavioral profiles.</p>
+      <div class="outcome">✅ Attack with average $2.3M damage potential averted. Analyst review time reduced by 90%.</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="sc-head"><span class="sc-icon">📱</span><div class="sc-title">Scenario II — App Marketplace Security</div></div>
+    <div class="sc-body">
+      <span class="sc-lbl">Situation</span>
+      <p>A major mobile marketplace receives hundreds of new applications daily. Manual review takes 1–2 days, creates backlogs, and occasionally allows malicious apps through undetected — damaging user trust and platform reputation.</p>
+      <span class="sc-lbl">With Griffinix</span>
+      <p>Every application is automatically analyzed upon receipt. Most cases are cleared within hours. Suspicious cases are flagged with behavioral summaries ready for human review — no deep technical expertise required to interpret findings.</p>
+      <div class="outcome">✅ Review time reduced from 2 days to 2 hours. Security quality and developer satisfaction both improved.</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="sc-head"><span class="sc-icon">🏛️</span><div class="sc-title">Scenario III — Tracking a Nation-State Threat Campaign</div></div>
+    <div class="sc-body">
+      <span class="sc-lbl">Situation</span>
+      <p>A national cybersecurity team has identified a sophisticated attack on critical infrastructure. They have a malware sample and must determine whether similar threats have been previously observed — and whether this is part of a larger coordinated operation.</p>
+      <span class="sc-lbl">With Griffinix</span>
+      <p>The sample is analyzed and its behavioral profile is searched against the library. Seven samples with overlapping behavioral patterns are surfaced, revealing this attack is part of an 18-month coordinated campaign — previously invisible in fragmented data.</p>
+      <div class="outcome">✅ What would have required weeks of manual analysis completed in hours, enabling a coordinated national response.</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="sc-head"><span class="sc-icon">🤖</span><div class="sc-title">Scenario IV — AI Security Model Training</div></div>
+    <div class="sc-body">
+      <span class="sc-lbl">Situation</span>
+      <p>A company building an AI-based threat detection system faces a critical bottleneck: a shortage of high-quality, accurately labeled behavioral training data. Existing datasets are stale, mislabeled, or insufficient in volume.</p>
+      <span class="sc-lbl">With Griffinix</span>
+      <p>Through the library, they access precisely labeled behavioral data with exact TTP annotations. They obtain balanced samples of both benign and malicious software, enabling their model to be trained on current, accurate, and richly annotated data.</p>
+      <div class="outcome">✅ Training data quality significantly improved. Development timeline reduced. Model detection accuracy elevated.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CH 10 ═══ -->
+<div class="chapter" id="ch10">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">10</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Limitations &amp; Roadmap</span>
+      <h2 class="ch-title">Limitations &amp; Development Roadmap</h2>
+    </div>
+  </div>
+
+  <h3>Current Limitations</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Limitation</th><th>Practical Impact</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>File Format Coverage</td><td>Currently supports Windows executables and Android APKs only</td><td><span class="status s-planned">Planned</span></td></tr>
+        <tr><td>Novel Evasion Techniques</td><td>Highly sophisticated malware may detect the analysis environment</td><td><span class="status s-ongoing">Active Development</span></td></tr>
+        <tr><td>Indexing Latency for New Samples</td><td>New samples not library-searchable until analysis completes</td><td><span class="status s-ongoing">Optimization</span></td></tr>
+        <tr><td>SIEM/SOAR Integration</td><td>Industry-standard output (STIX/TAXII) not yet available</td><td><span class="status s-planned">Planned</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Capabilities in the Development Pipeline</h3>
+  <ul>
+    <li>Support for firmware and embedded systems analysis</li>
+    <li>Automatic MITRE ATT&amp;CK framework mapping in all reports</li>
+    <li>Cross-sample relationship tracking for campaign attribution</li>
+    <li>STIX/TAXII output for integration with existing security tooling</li>
+    <li>Live network traffic monitoring via real-time streaming analysis</li>
+  </ul>
+</div>
+
+<!-- ═══ CH 11 ═══ -->
+<div class="chapter" id="ch11">
+  <div class="ch-header">
+    <div class="ch-num-wrap">
+      <span class="ch-num-lbl">Chapter</span>
+      <span class="ch-num-big">11</span>
+    </div>
+    <div class="ch-texts">
+      <span class="ch-en">Conclusion</span>
+      <h2 class="ch-title">Conclusion</h2>
+    </div>
+  </div>
+
+  <h3>Summary of Griffinix Value in TI</h3>
+  <div class="table-wrap">
+    <table class="summary-table">
+      <thead><tr><th>Problem Solved</th><th>Value Created</th></tr></thead>
+      <tbody>
+        <tr><td>Surface-level, indicator-based TI</td><td>Deep behavioral understanding of threat intent and method</td></tr>
+        <tr><td>The gap between static and dynamic analysis</td><td>A complete, unified picture of every threat</td></tr>
+        <tr><td>Slow, expensive manual analysis workflows</td><td>Automated, rapid, infinitely scalable analysis</td></tr>
+        <tr><td>Dispersed, unsearchable analytical knowledge</td><td>An intelligent library that compounds in value over time</td></tr>
+        <tr><td>Technical reports inaccessible to leadership</td><td>Clear narrative reports usable across all organizational levels</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Griffinix as a Strategic TI Module</h3>
+  <p>Griffinix can serve as a central hub in any organization's threat intelligence architecture — the definitive point for:</p>
+  <ul>
+    <li>Deep analysis of any unknown threat, without requiring rare technical expertise</li>
+    <li>Automatic enrichment of SIEM/SOAR systems with genuine behavioral intelligence</li>
+    <li>Behavior-based Threat Hunting that surpasses signature-dependent approaches</li>
+    <li>Continuous training of AI security models with fresh, accurately labeled data</li>
+    <li>Campaign attribution through behavioral similarity across threat actors</li>
+  </ul>
+
+  <h3>The Strategic Horizon</h3>
+  <p>In a world where AI tools can generate malware at industrial scale and near-zero cost, threat intelligence grounded in surface indicators is no longer sufficient — it is structurally broken as a defense strategy.</p>
+
+  <div class="callout gold">
+    <strong>The Only Resilient Approach</strong>
+    The only methodology that holds against this wave of AI-generated threats is <strong>deep behavioral understanding</strong> — knowing what software truly does, not what it appears to be. This is precisely the value that Griffinix delivers to threat intelligence: intelligence that understands, not merely recognizes.
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<footer class="doc-footer">
+  <div class="f-logo">GRIFFINIX</div>
+  <div class="f-meta">Threat Intelligence · February 2026 · Version 1.0</div>
+  <!--<div class="f-class">Confidential</div> -->
+</footer>
+
+<script>
+// Reading progress
+const pb = document.getElementById('pb');
+window.addEventListener('scroll', () => {
+  const t = window.scrollY;
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  pb.style.width = (t / h * 100) + '%';
+}, { passive: true });
+
+// Chapter reveal
+const chs = document.querySelectorAll('.chapter');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.07 });
+chs.forEach(c => obs.observe(c));
+
+// Stagger val-cards
+document.querySelectorAll('.val-card').forEach((c, i) => {
+  c.style.transitionDelay = (i * 0.06) + 's';
+});
+</script>
+</body>
+</html>
